@@ -19,6 +19,21 @@ from Bio.Emboss.Applications import NeedleallCommandline
 handle = gzip.open("uniprot_sprot.xml.gz")
 records = SeqIO.parse(handle, "uniprot-xml")
 
+"""When inputting a file into the function, it is important that the function used is in fasta format.
+Therefore, the first function is to convert the file into a format that I need:"""
+
+def format_conversion(file_name, current_format):
+    name = os.path.splitext(file_name)[0]
+    if os.path.splitext(file_name)[1] == ".fasta":
+            print("This file is already in fasta format!")
+    else:
+        name = name + ".fasta"
+        count = SeqIO.convert(file_name, current_format, name, "fasta")
+        print("converted %i records" % count)
+
+format_conversion("cor6_6.gb", "genbank")
+format_conversion("opuntia.fasta", "fasta")
+
 """in order to do this, we first need to download clustal to the computer. we do
 this by going into the downloads directory in the cline and typing
 'sudo apt-get install clustalw'
@@ -26,6 +41,8 @@ i will be using opuntia.fasta, the downloaded file is found on http://biopython.
 we first gonna try this and then move onto my coursework"""
 
 def clustalw(file):
+    """ This is a function that aligns sequences within a file using clustalw.
+    Then the sequences are represented in a phylogenetic tree.""" 
     cline = ClustalwCommandline("clustalw", infile=file)
     print(cline)
     stdout, stderr = cline()
@@ -34,6 +51,7 @@ def clustalw(file):
     alignment_name = alignment_name + ".aln"
     align = AlignIO.read(alignment_name,"clustal")
     print(align)
+    """The sequences can be represented as a phylogenetic tree: """
     tree_name = os.path.splitext(file)[0]
     tree_name = tree_name + ".dnd"
     tree = Phylo.read(tree_name, "newick")
@@ -76,10 +94,6 @@ def tcoffee():
 
     tcoffee_aligned = AlignIO.read("tcoffee_aligned.aln", "clustal")
     print(align)
-
-
-
-
 
 child = subprocess.Popen(str(tcoffee_cline),
                          stdout=subprocess.PIPE,
